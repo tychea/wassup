@@ -1,0 +1,158 @@
+.loginContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, rgba(139,163,187,1) 0%, rgba(44,62,80,1) 100%);
+
+}
+.loginFormWrapper{
+    background-color: white;
+    width:350px;
+    border-radius: 20px;
+    padding: 20px;
+
+}
+.registrationContentWrapper{
+    width:800px;
+    background:white;
+    display: flex;
+    flex:wrap;
+}
+.leftSideLogo{
+    width:500px;
+    background-image:url('/image/background.png');
+    background-size: cover;
+    background-repeat: none;
+}
+/////////////////////////////
+.scence{
+  width: 350px;
+  height: 600px;
+  perspective: 10000px;
+  
+}
+.formWrapper{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition:all 0.5s linear;
+  transform-style:preserve-3d;
+}
+
+.form {
+  z-index:1;  
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  padding: 25px;
+  background: #e6e6e6;
+  border: 1px solid #dfdfdf;
+  box-shadow: 0px 8px 5px 7px rgba(44,62,80,0.8);
+}
+.front  { transform: rotateY(0deg) translateZ(175px); }
+.right  { transform: rotateY(90deg) translateZ(175px);  }
+.left   { transform: rotateY(-90deg) translateZ(175px); }
+.logoWrapper{
+  text-align: center;
+  -webkit-box-shadow: 0px 5px 5px 5px rgba(44,62,80,0.8);
+  -moz-box-shadow: 0px 5px 5px 5px rgba(44,62,80,0.8);
+  box-shadow: 0px 5px 5px 5px rgba(44,62,80,0.8);
+  padding: 30px
+}
+.input {
+  border: 1px solid #dfdfdf;
+  background: #e6e6e6;
+  height: 48px;
+  width: 100%;
+  padding-left: 50px;
+  transition: all 0.5s 0s ease;
+}
+// .input:focus{
+//   padding-left:55px;
+// }
+.form,.field,.Test,.button,.input{
+  border-radius: 5px;
+}
+.field{
+  position: relative;
+  margin-top:30px;
+  border: 1px solid rgba(44,62,80,0.8);
+  // -webkit-box-shadow: 0px 5px 5px 5px rgba(44,62,80,0.8);
+  // -moz-box-shadow: 0px 5px 5px 5px rgba(44,62,80,0.8);
+  // box-shadow: 0px 5px 5px 5px rgba(44,62,80,0.8);
+}
+.field:focus-within .input{
+  padding-left:55px;
+}
+.field:focus-within .icon{
+  margin-left:10px;
+}
+.icon{
+  position: absolute ;
+  font-size: 25px;
+  margin: 12px;
+  transition: all 0.5s 0s ease;
+}
+.button {
+  display: block;
+  width: 100%;
+  border: 0;
+  text-align: center;
+  font-weight: bold;
+  color: #fff;
+  background:#2c3e50;
+  margin-top: 20px;
+  padding: 14px;
+  cursor: pointer;
+  // -webkit-box-shadow: 0px 5px 5px 5px rgba(44,62,80,0.8);
+  // -moz-box-shadow: 0px 5px 5px 5px rgba(44,62,80,0.8);
+  // box-shadow: 0px 5px 5px 5px rgba(44,62,80,0.8);
+}
+// .btnOk
+// .forgetRegister{
+//   margin: 20px 0;
+//   position: relative;
+// }
+.small{
+  position: relative;
+  width:100%;
+  margin-top: 10px;
+}
+.small>a{
+  position: absolute;
+  text-decoration: underline !important;
+  color:rgba(44,62,80,0.8);
+}
+.small>a:hover{
+  cursor: pointer;
+}
+a:last-child{
+  right: 0;
+}
+.registerForm{
+  transform:rotateY(-90deg);
+}
+.forgetPasswordForm{
+  transform:rotateY(90deg);
+}
+.backButton{
+  margin-top:20px;
+  font-size: 30px;
+  color:rgba(44,62,80,0.8);
+}
+.okBackWrapper{
+  margin-top:20px;
+  position: relative;
+}
+.error{
+  color:red;
+  font-size: 12px;
+}
+.disableButton{
+  background:grey;
+}
+.disableButton:hover{
+  cursor: not-allowed;
+}
