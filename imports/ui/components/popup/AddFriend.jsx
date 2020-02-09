@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { faTimesCircle,faCheckCircle, faMeteor,faUserCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import UserProfileImage from "../../../api/file/UserProfileImage"
 export default class AddFriend extends Component {
   constructor(props){
     super(props);
@@ -45,12 +46,13 @@ render() {
      
        <form onSubmit={this.props.handleFindFriend}>
           <a onClick={this.handleClick} className="closeAddFriend"> <FontAwesomeIcon icon={faTimesCircle} /> </a>
-          <div className='friendEmail'>Please Input Your Friend Email</div>
+          
           {this.props.buttonAddFriend?null:(
             
             
             <div className="containerDisplay">
               {/* <img style={{ width: "200px",background:"#2c3e50",height:"200px",margin: "10px" }} src="/image/logo2.png" alt="Logo"/> */}
+              <div className='friendEmail'>Please Input Your Friend Email</div>
               <input className="search-friend-email"  ref="addEmail" type="text" name=" " placeholder="Email" onChange={this.props.handleChangeInput.bind(this)}/>
               <a onClick={this.props.handleFindFriend} className="closeAddFriend"> <FontAwesomeIcon icon={faUserCheck} /> </a> 
             </div>)}
@@ -59,8 +61,10 @@ render() {
         
         (<div style={{width:'100%',textAlign:'center'}} >
             <div className="containerDisplay">
-                <img style={{ width: "200px",background:"#2c3e50",height:"200px",margin: "10px" }} src="/image/logo2.png" alt="Logo"/>
+                <img style={{ width: "200px",background:"#2c3e50",height:"200px",margin: "10px" }} src={this.props.findFriend.profileLink==''?"/image/logo2.png":UserProfileImage.findOne({_id: this.props.findFriend.profileLink}).link()} alt="Logo"/>
+                {/* {console.log(UserProfileImage.findOne({_id: this.props.findFriend.}))} */}
             </div>
+            <div className='friendEmail'>{this.props.findFriend.firstname +" " +this.props.findFriend.lastname}</div>
             <a onClick={this.handleSendFriendRequest} className="sendAddFriend"> <FontAwesomeIcon icon={faCheckCircle} /> </a> 
         
             <a onClick={this.handleButtonAddFriend} className="closeAddFriend"> <FontAwesomeIcon icon={faTimesCircle} /> </a> 

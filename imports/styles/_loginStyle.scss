@@ -51,9 +51,10 @@
   border: 1px solid #dfdfdf;
   box-shadow: 0px 8px 5px 7px rgba(44,62,80,0.8);
 }
-.front  { transform: rotateY(0deg) translateZ(175px); }
+.front  { transform: rotateY(0deg) translateZ(175px);   }
 .right  { transform: rotateY(90deg) translateZ(175px);  }
 .left   { transform: rotateY(-90deg) translateZ(175px); }
+.back   { transform: rotateY(180deg) translateZ(175px); }
 .logoWrapper{
   text-align: center;
   -webkit-box-shadow: 0px 5px 5px 5px rgba(44,62,80,0.8);
@@ -136,6 +137,9 @@ a:last-child{
 }
 .forgetPasswordForm{
   transform:rotateY(90deg);
+}
+.confirmEmailForm{
+  transform:rotateY(-180deg);
 }
 .backButton{
   margin-top:20px;

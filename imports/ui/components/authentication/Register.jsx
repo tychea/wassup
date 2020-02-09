@@ -4,6 +4,8 @@ import { faKey } from "@fortawesome/free-solid-svg-icons";
 import { faUserTie } from "@fortawesome/free-solid-svg-icons";
 import { faBackspace } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Accounts } from 'meteor/accounts-base';
+import { Meteor } from 'meteor/meteor';
 const validEmailRegex = RegExp(
     /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 );
@@ -48,11 +50,40 @@ export default class Register extends Component{
             },
             submitErrors:{
                 emails:""
-            }
+            },
         }
     }
+    registerUser= (event)=>{
+      // prevents page from refreshing onSubmit
+      event.preventDefault();
+
+          Meteor.call('user.register',this.state.user,(error,result)=>{
+          if(error){
+            Bert.alert({
+              title: 'Error',
+              message: error.reason,
+              type: 'danger',
+              style: 'growl-top-left'     
+            });
+          }else{
+            Bert.alert({
+              title: 'Cogration',
+              message: 'You Have Success Register',
+              type: 'success',
+              style: 'growl-top-left'     
+            });
+             Meteor.loginWithToken(result.token);
+           }
+  
+        })
+      
+      
+      
+    };
     handleChangeInput = e => {
+      
         e.preventDefault();
+  
         const { id, value } = e.target;
         let formErrors = this.state.formErrors;
         let user = {...this.state.user, [id]: value};
@@ -75,63 +106,23 @@ export default class Register extends Component{
           case "confirmPassword":
             formErrors.confirmPassword =
               value.length < 8 ? "minimun 8 charactor required" : "";   
-            formErrors.confirmPassword = 
-              value===user.password?"":"password miss match";
             break;
           default:
             break;
         }
         
-        this.setState({ formErrors,  user  });
+        this.setState({ formErrors,  user  },()=>{console.log(this.state.user)});
 
       };
 
-    registerUser = event => {
-        // prevents page from refreshing onSubmit
-        event.preventDefault();
-        if (formValid(this.state.formErrors)&&userNotEmpty(this.state.user)) {
-          console.log(`\
-                    --Submiting--
-                    FirstName:${this.state.user.firstname}
-                    LastName:${this.state.user.lastname}
-                    Email: ${this.state.user.emails}
-                    Password: ${this.state.user.password}
-                `);
-          Meteor.call('user.register',this.state.user,(error,result)=>{
-            if(error){
-              Bert.alert({
-                title: 'Error',
-                message: error.reason,
-                type: 'danger',
-                style: 'growl-top-left'     
-              });
-            }else{
-              Bert.alert({
-                title: 'Cogration',
-                message: result,
-                type: 'success',
-                style: 'growl-top-left'     
-              });
-              Meteor.call( 'sendVerificationLink', ( error, response ) => {
-                if ( error ) {
-                  Bert.alert( error.reason, 'danger' );
-                } else {
-                  Bert.alert( 'Welcome!', 'success' );
-                }
-              });
-                // Meteor.loginWithPassword(this.state.user.emails, this.state.user.password);
-              // ReactDOM.findDOMNode(this.refs.textInput).value = '';
-            }
-          })
-        }
-        
-    };
 
     render(){
-        const isEnable=formValid(this.state.formErrors)&&userNotEmpty(this.state.user);
-       
+        const isEnable=formValid(this.state.formErrors)&&userNotEmpty(this.state.user)&&(this.state.user.password===this.state.user.confirmPassword);
+        
         return(
-            <form onSubmit={this.registerUser}  className="form right">
+  
+            <div className="form right">
+            <form onSubmit={this.registerUser.bind(this)}>
             <h4 style={{ textAlign: "center" }}>Register New Account</h4>
             <div className="field ">
               <FontAwesomeIcon className="icon" icon={faUserTie} />
@@ -207,19 +198,28 @@ export default class Register extends Component{
             {this.state.formErrors.confirmPassword.length > 0 && (
               <span className="error">{this.state.formErrors.confirmPassword}</span>
             )}
+            {
+              (formValid(this.state.formErrors)&&userNotEmpty(this.state.user))?
+              ((this.state.user.password!=this.state.user.confirmPassword)?
+              <span className="error">Password Miss Match</span>:null):null
+            }
             <div className="okBackWrapper">
               <button 
+                  type='submit'
                   disabled={!isEnable}
+                  onClick={this.registerUser}
                   id='registerButton'
                   className={`button ${ isEnable? "" : "disableButton"}`}
-                  type="submit">
+                  >
                   OK
+
               </button>
             </div>
+            </form>
             <a onClick={this.props.switchToRegister}>
                 <FontAwesomeIcon className="backButton" icon={faBackspace} />
             </a>
-          </form>
+          </div>
         )
     }
 

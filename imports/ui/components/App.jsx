@@ -3,6 +3,7 @@ import AddFriend from './popup/AddFriend';
 import ReactDOM from 'react-dom';
 import AppSideBar from './AppSidebar';
 import Notification from './popup/Notification';
+import UserProfile from './popup/UserProfile';
 import ChatBox from './ChatBox';
 import { array } from 'prop-types';
 import FriendList from './FriendList';
@@ -11,6 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { withTracker } from 'meteor/react-meteor-data';
 import {Messages} from '../../api/message/messages';
 import UserFiles from '../../api/file/UseFiles';
+import UserProfileImage from '../../api/file/UserProfileImage';
  class App extends Component {
     constructor(props) {
         super(props);
@@ -18,13 +20,15 @@ import UserFiles from '../../api/file/UseFiles';
             newFriend:'',
             addFriend:false,
             buttonAddFriend:false,
+            buttonUserProfile:false,
             findFriend:{},
             notification:false,   
             selectedFriendId:'', 
             uploading: [],
             progress: 0,
             inProgress: false,
-            errorUpload:'',       
+            errorUpload:'', 
+            userProfileLink:{},      
         }
     }
     uploadFileClick(event){
@@ -61,8 +65,12 @@ import UserFiles from '../../api/file/UseFiles';
             
             uploadInstance.on('uploaded', function (error, fileObj) {
                 if(error){
-                    
-                     console.log(error.reason);
+                    Bert.alert({
+                        title: 'Error',
+                        message: error.reason,
+                        type: 'danger',
+                        style: 'growl-top-left'     
+                      });
                     // self.setState({errorUpload:error.reason},()=>{console.log(self.state.errorUpload)});
                 }else{
                     const chatTextWithChatId = {chatText:fileObj._id,chatId:self.state.selectedFriendId.messageId,isFile:true};
@@ -108,10 +116,11 @@ import UserFiles from '../../api/file/UseFiles';
         this.setState({buttonAddFriend: !this.state.buttonAddFriend,newFriend:''});
         
     };
+
     handleChangeInput=(e)=>{
         const value = e.target.value;
         this.setState({newFriend:value});
-    }
+    };
 
     handleSendMessage=(event)=>{
         event.preventDefault();
@@ -150,6 +159,9 @@ import UserFiles from '../../api/file/UseFiles';
     toggleNotification=()=>{
         this.setState({notification: !this.state.notification});
     }
+    toggleUserProfile=()=>{
+        this.setState({buttonUserProfile: !this.state.buttonUserProfile});
+    };
     getLastChild=()=>{
         const lastChild =document.querySelector('.middleOfContent').lastElementChild;
         lastChild.scrollIntoView;
@@ -160,15 +172,20 @@ import UserFiles from '../../api/file/UseFiles';
               return  <h1>{this.state.messageid[message[1]][0].id}</h1>
             }
         }
-
+     
        
         
         return (       
             <div className="main-container h-100 bg-secondary">
-                {this.state.addFriend ? <AddFriend  findFriend={this.state.findFriend} toggleButtonAddFriend={this.toggleButtonAddFriend} buttonAddFriend={this.state.buttonAddFriend} handleChangeInput={this.handleChangeInput} handleFindFriend={this.handleFindFriend} handleAddFriend={this.handleAddFriend} toggleAddFriend={this.toggleAddFriend} /> : null}
+                {this.state.addFriend ? <AddFriend userProfileLink={Meteor.user().profileLink} findFriend={this.state.findFriend} toggleButtonAddFriend={this.toggleButtonAddFriend} buttonAddFriend={this.state.buttonAddFriend} handleChangeInput={this.handleChangeInput} handleFindFriend={this.handleFindFriend} handleAddFriend={this.handleAddFriend} toggleAddFriend={this.toggleAddFriend} /> : null}
                 {this.state.notification?<Notification dataLoading={this.props.dataLoading} toggleNotification={this.toggleNotification}/>:null}
+                {this.state.buttonUserProfile?(this.props.dataLoading?'':<UserProfile toggleUserProfile={this.toggleUserProfile} userProfileLink={Meteor.user().profileLink}/>):null}
                 {/* <div className="sidebar ">   */}
-                <AppSideBar  toggleNotification={this.toggleNotification} dataLoading={this.props.dataLoading} toggleAddFriend={this.toggleAddFriend} clicked={this.friendProfileClickHandler} />
+                {this.props.dataLoading?'':
+                    this.props.dataLoading3?'':<AppSideBar userProfileLink={Meteor.user().profileLink} toggleUserProfile={this.toggleUserProfile}  toggleNotification={this.toggleNotification} dataLoading={this.props.dataLoading} toggleAddFriend={this.toggleAddFriend} clicked={this.friendProfileClickHandler} />
+                }
+                {/* {this.props.dataLoading?'': <AppSideBar userProfileLink={Meteor.user().profileLink} toggleUserProfile={this.toggleUserProfile}  toggleNotification={this.toggleNotification} dataLoading={this.props.dataLoading} toggleAddFriend={this.toggleAddFriend} clicked={this.friendProfileClickHandler} />} */}
+                
                 {/* </div> */}
                 <div className="content ">
                     <div className='topOfContent'>
@@ -190,17 +207,27 @@ import UserFiles from '../../api/file/UseFiles';
                                                                 let link = UserFiles.findOne({_id: file._id}).link();
                                                                 return (
                                                                 <div>
-                                                                    {file.name} 
-                                                                    <a href={link}  target="_blank" >
-                                                                        <FontAwesomeIcon icon={faDownload} />              
-                                                                    </a>
+                                                                    {(file.ext=='png'||file.ext=='jpg')?
+                                                                    <div>
+                                                                        <img style={{width:'150px',height:'200px'}} src={link}/>                                          
+                                                                        <a href={link}  target="_blank" >
+                                                                            <FontAwesomeIcon icon={faDownload} />              
+                                                                        </a>
+                                                                    </div>
+                                                                    :
+                                                                    <div style={{backgroundColor:"#2c3e50", color:'white'}}>
+                                                                        {file.name}
+                                                                        <a href={link}  target="_blank" >
+                                                                            <FontAwesomeIcon icon={faDownload} />              
+                                                                        </a>
+                                                                    </div>}
                                                                 </div>)
                                                                 
                                                             }
                                                         })
                                                       
                                                     )
-                                                    :message.messageText}</div>)
+                                                    :<div style={{padding: '10px',borderRadius: '10px',backgroundColor:"#2c3e50", color:'white'}}>{message.messageText}</div>}</div>)
                                             }else{
                                                 return (<div key={index}  className='chatBox' >{message.isFile?
                                                     this.props.dataLoading3?'':(
@@ -209,16 +236,26 @@ import UserFiles from '../../api/file/UseFiles';
                                                                 let link = UserFiles.findOne({_id: file._id}).link();
                                                                 return (
                                                                 <div>
-                                                                    {file.name} 
-                                                                    <a href={link}  target="_blank" >
-                                                                        <FontAwesomeIcon icon={faDownload} />              
-                                                                    </a>
+                                                                    {(file.ext=='png'||file.ext=='jpg')?
+                                                                    <div>
+                                                                        <img style={{width:'150px',height:'200px'}} src={link}/>                                          
+                                                                        <a href={link}  target="_blank" >
+                                                                            <FontAwesomeIcon icon={faDownload} />              
+                                                                        </a>
+                                                                    </div>
+                                                                    :
+                                                                    <div style={{backgroundColor:"#2c3e50", color:'white'}}>
+                                                                        {file.name}
+                                                                        <a href={link}  target="_blank" >
+                                                                            <FontAwesomeIcon icon={faDownload} />              
+                                                                        </a>
+                                                                    </div>}
                                                                 </div>)
                                                             }
                                                         })
                                                       
                                                     )
-                                                    :message.messageText}</div>)
+                                                    :<div style={{padding: '10px',borderRadius: '10px',backgroundColor:"slategrey", color:'white'}}>{message.messageText}</div>}</div>)
                                             }
                                             
                                     })  
@@ -226,7 +263,9 @@ import UserFiles from '../../api/file/UseFiles';
                                 )  
                                )
                             }
+
                     </div>
+                    
                         {/* {this.props.dataLoading3?'':console.log(this.props.files)} */}
                     <div className='bottomOfContent'>
                     {this.state.selectedFriendId==''?null:(
@@ -247,7 +286,8 @@ import UserFiles from '../../api/file/UseFiles';
                         </a>
 
                     </form>    
-                    )}     
+                    )} 
+                    
                     </div>   
                 </div>
             </div>   
@@ -261,6 +301,9 @@ export default withTracker (()=>{
     var handle = Meteor.subscribe('user');
     var handle2 = Meteor.subscribe('messages');
     const handle3 = Meteor.subscribe('files.all');
+    const handle4 = Meteor.subscribe('allUserProfile');
+    const handle5= Meteor.subscribe('allFriendProfileLink');
+    const userProfileImg = UserProfileImage.find({}).fetch;
     const files = UserFiles.find({}, {sort: {name: 1}}).fetch();
     const messages = Messages.find({}).fetch();
     const newMessages = {};
@@ -271,6 +314,10 @@ export default withTracker (()=>{
          user:Meteor.user(),
          newMessages,
          files,
+         userProfileImg,
+         handle5,
+         dataLoading5:!handle5.ready()||!Meteor.user(),
+         dataLoading4: !handle4.ready() || !Meteor.user(),
          dataLoading3: !handle3.ready() || !Meteor.user(),
          dataLoading2:!handle2.ready()||!Meteor.user(),
          dataLoading: !handle.ready() || !Meteor.user(), 
